@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Story – From First Bench to Forever</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Dancing+Script:wght@400;600;700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --peach: #FFCBA4;
+    --peach-light: #FFE5D4;
+    --peach-deep: #E8956D;
+    --cream: #FFF8F0;
+    --pink: #F9C5D1;
+    --pink-deep: #E8899A;
+    --blush: #F4D4DA;
+    --rose: #C97B84;
+    --gold: #D4A96A;
+    --text-dark: #4A2C2A;
+    --text-mid: #7A4A4A;
+    --text-light: #A67B7B;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ===== HEARTS CANVAS ===== */
+  #hearts-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ===== MUSIC TOGGLE ===== */
+  #music-btn {
+    position: fixed;
+    top: 20px; right: 20px;
+    z-index: 1000;
+    background: rgba(255,255,255,0.85);
+    border: 2px solid var(--pink-deep);
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-family: 'Lato', sans-serif;
+    color: var(--rose);
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(200,100,120,0.2);
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+  }
+  #music-btn:hover { background: var(--pink); transform: scale(1.05); }
+
+  /* ===== TIMELINE NAV ===== */
+  #timeline-nav {
+    position: fixed;
+    left: 20px; top: 50%;
+    transform: translateY(-50%);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .tl-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--pink);
+    border: 2px solid var(--rose);
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .tl-dot:hover, .tl-dot.active {
+    background: var(--rose);
+    transform: scale(1.3);
+  }
+  .tl-dot::after {
+    content: attr(data-label);
+    position: absolute;
+    left: 18px; top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.92);
+    border: 1px solid var(--pink);
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: var(--rose);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    font-family: 'Lato', sans-serif;
+  }
+  .tl-dot:hover::after { opacity: 1; }
+
+  /* ===== SECTION BASE ===== */
+  section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== SECTION 1: LANDING ===== */
+  #landing {
+    background: linear-gradient(135deg, #FFF0EA 0%, #FFE8F0 40%, #FFF5E0 100%);
+    flex-direction: column;
+    text-align: center;
+  }
+  #landing::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(255,180,150,0.3) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(249,197,209,0.4) 0%, transparent 60%);
+  }
+  .landing-content { position: relative; z-index: 2; }
+  .landing-eyebrow {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.4rem;
+    color: var(--peach-deep);
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+  }
+  .landing-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 4.2rem);
+    font-style: italic;
+    color: var(--text-dark);
+    line-height: 1.3;
+    margin-bottom: 24px;
+    max-width: 800px;
+  }
+  .landing-subtitle {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.5rem, 3vw, 2.4rem);
+    color: var(--rose);
+    margin-bottom: 50px;
+  }
+  .begin-btn {
+    display: inline-block;
+    padding: 16px 44px;
+    background: linear-gradient(135deg, var(--peach-deep), var(--pink-deep));
+    color: white;
+    border-radius: 50px;
+    font-family: 'Lato', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: 0 8px 30px rgba(200,100,120,0.35);
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+  }
+  .begin-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 40px rgba(200,100,120,0.45);
+  }
+  .scroll-hint {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: var(--text-light);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: bounce 2s infinite;
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-8px); }
+  }
+
+  /* ===== STORY SECTIONS ===== */
+  .story-section {
+    padding: 100px 40px;
+    min-height: 100vh;
+  }
+  .story-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+  .chapter-label {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.1rem;
+    color: var(--peach-deep);
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .chapter-year {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--peach-light), var(--pink));
+    border-radius: 30px;
+    padding: 6px 20px;
+    font-size: 0.85rem;
+    color: var(--rose);
+    letter-spacing: 2px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    margin-bottom: 20px;
+    border: 1px solid rgba(200,100,120,0.2);
+  }
+  .chapter-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    color: var(--text-dark);
+    line-height: 1.2;
+    margin-bottom: 36px;
+  }
+  .story-text {
+    font-size: 1.1rem;
+    line-height: 1.95;
+    color: var(--text-mid);
+    font-weight: 300;
+    margin-bottom: 24px;
+  }
+  .story-text em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--text-dark);
+    font-size: 1.15rem;
+  }
+  .emotional-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+    color: var(--rose);
+    text-align: center;
+    padding: 40px;
+    border-left: 3px solid var(--pink);
+    border-right: 3px solid var(--pink);
+    margin: 40px 0;
+    line-height: 1.6;
+    background: rgba(249,197,209,0.1);
+    border-radius: 4px;
+  }
+  .photo-slot {
+    width: 100%;
+    background: linear-gradient(135deg, var(--peach-light), var(--blush));
+    border: 2px solid var(--pink-deep);
+    border-radius: 20px;
+    padding: 10px;
+    text-align: center;
+    margin: 30px 0;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .photo-slot:hover { border-color: var(--rose); box-shadow: 0 4px 15px rgba(249,197,209,0.4); }
+  .photo-slot img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+  }
+  .divider {
+    text-align: center;
+    color: var(--pink);
+    font-size: 1.4rem;
+    margin: 40px 0;
+    letter-spacing: 8px;
+  }
+
+  /* ===== SECTION BG COLORS ===== */
+  #s2 { background: linear-gradient(160deg, #FFF8F0, #FFE8E0); }
+  #s3 { background: linear-gradient(160deg, #FFF0F5, #FFF5EE); }
+  #s4 { background: linear-gradient(160deg, #FFF8EE, #FFE8F0); }
+  #s5 { background: linear-gradient(160deg, #FFE8F0, #FFF0EA); }
+  #s6 { background: linear-gradient(160deg, #F5F0FF, #FFE8E8); }
+  #s7 { background: linear-gradient(160deg, #FFF0EA, #F0F8FF); }
+  #s8 { background: linear-gradient(160deg, #FFF5E8, #FFE8F5); }
+  #s9 { background: linear-gradient(160deg, #FFE8F0, #FFF8EA); }
+  #s10 { background: linear-gradient(160deg, #EEF0FF, #FFE8EE); }
+  #s11 { background: linear-gradient(160deg, #FFF0EA, #E8F5FF); }
+
+  /* Floating petals */
+  .petal {
+    position: absolute;
+    width: 12px; height: 12px;
+    background: var(--pink);
+    border-radius: 50% 0 50% 0;
+    opacity: 0.3;
+    animation: floatPetal 8s infinite ease-in-out;
+  }
+  @keyframes floatPetal {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+    50% { transform: translateY(-30px) rotate(180deg); opacity: 0.15; }
+    100% { transform: translateY(0) rotate(360deg); opacity: 0.3; }
+  }
+
+  /* ===== BIRTHDAY FINALE ===== */
+  #finale {
+    background: linear-gradient(135deg, #3D1A24, #5C2D3A, #3D1A24);
+    color: white;
+    text-align: center;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  #finale::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,150,150,0.15) 0%, transparent 70%);
+  }
+  .finale-content { position: relative; z-index: 2; max-width: 700px; }
+  .finale-date {
+    font-family: 'Lato', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 5px;
+    color: rgba(255,200,180,0.7);
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  .finale-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    color: var(--peach-light);
+    margin-bottom: 40px;
+    line-height: 1.2;
+  }
+  .finale-body {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    line-height: 2;
+    color: rgba(255,220,200,0.9);
+    margin-bottom: 50px;
+  }
+  .finale-sign {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2rem;
+    color: var(--peach);
+    margin-top: 30px;
+  }
+  .hearts-rain {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+
+  /* ===== MESSAGE FUTURE ===== */
+  #future-section {
+    background: linear-gradient(160deg, #FFF0F8, #FFF8F0);
+    padding: 100px 40px;
+  }
+  .future-inner {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .future-textarea {
+    width: 100%;
+    min-height: 180px;
+    background: white;
+    border: 2px solid var(--pink);
+    border-radius: 20px;
+    padding: 24px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    resize: none;
+    outline: none;
+    margin-top: 30px;
+    transition: border 0.3s;
+    line-height: 1.8;
+  }
+  .future-textarea:focus { border-color: var(--rose); }
+  .future-btn {
+    margin-top: 20px;
+    padding: 14px 40px;
+    background: linear-gradient(135deg, var(--rose), var(--peach-deep));
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-family: 'Lato', sans-serif;
+    cursor: pointer;
+    letter-spacing: 1px;
+    box-shadow: 0 6px 20px rgba(200,100,120,0.3);
+    transition: all 0.3s;
+  }
+  .future-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(200,100,120,0.4); }
+  .future-saved {
+    display: none;
+    margin-top: 20px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.3rem;
+    color: var(--rose);
+  }
+
+  /* ===== SPARKLE ===== */
+  .sparkle {
+    position: absolute;
+    pointer-events: none;
+    font-size: 1.2rem;
+    animation: sparkleAnim 1s ease-out forwards;
+  }
+  @keyframes sparkleAnim {
+    0% { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0; transform: scale(0.5) translateY(-40px); }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 600px) {
+    #timeline-nav { display: none; }
+    section, .story-section { padding: 70px 24px; }
+    .emotional-quote { padding: 24px; }
+  }
+
+  /* Landing petals floating */
+  .float-heart {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: floatHeart 6s ease-in-out infinite;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  @keyframes floatHeart {
+    0%,100% { transform: translateY(0) rotate(-10deg); }
+    50% { transform: translateY(-20px) rotate(10deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hearts Canvas for click effect -->
+<canvas id="hearts-canvas"></canvas>
+
+<!-- Music Button -->
+<button id="music-btn" onclick="toggleMusic()">🎵 Music: OFF</button>
+
+<!-- Timeline Nav -->
+<nav id="timeline-nav">
+  <div class="tl-dot active" data-label="Our Beginning" data-target="landing" onclick="scrollTo('landing')"></div>
+  <div class="tl-dot" data-label="1st Standard" data-target="s2" onclick="scrollToSection('s2')"></div>
+  <div class="tl-dot" data-label="Growing Up" data-target="s3" onclick="scrollToSection('s3')"></div>
+  <div class="tl-dot" data-label="Getting Close" data-target="s4" onclick="scrollToSection('s4')"></div>
+  <div class="tl-dot" data-label="The Proposal" data-target="s5" onclick="scrollToSection('s5')"></div>
+  <div class="tl-dot" data-label="Distance" data-target="s6" onclick="scrollToSection('s6')"></div>
+  <div class="tl-dot" data-label="Silent Love" data-target="s7" onclick="scrollToSection('s7')"></div>
+  <div class="tl-dot" data-label="Growing Up" data-target="s8" onclick="scrollToSection('s8')"></div>
+  <div class="tl-dot" data-label="Last Memories" data-target="s9" onclick="scrollToSection('s9')"></div>
+  <div class="tl-dot" data-label="Goodbye" data-target="s10" onclick="scrollToSection('s10')"></div>
+  <div class="tl-dot" data-label="Long Distance" data-target="s11" onclick="scrollToSection('s11')"></div>
+  <div class="tl-dot" data-label="Birthday" data-target="finale" onclick="scrollToSection('finale')"></div>
+</nav>
+
+<!-- Hidden audio -->
+<audio id="bg-music" loop>
+  <source src="audio.mpeg" type="audio/mpeg">
+</audio>
+
+<!-- ===== SECTION 1: LANDING ===== -->
+<section id="landing">
+  <div class="float-heart" style="top:15%;left:10%;animation-delay:0s">🌸</div>
+  <div class="float-heart" style="top:25%;right:12%;animation-delay:1s">✨</div>
+  <div class="float-heart" style="bottom:20%;left:8%;animation-delay:2s">🌷</div>
+  <div class="float-heart" style="bottom:30%;right:10%;animation-delay:0.5s">💕</div>
+  <div class="float-heart" style="top:60%;left:5%;animation-delay:1.5s">🌹</div>
+
+  <div class="landing-content fade-in visible">
+    <div class="landing-eyebrow">✦ a story of us ✦</div>
+    <h1 class="landing-title">"I saw you before I knew<br>I would love you…"</h1>
+    <p class="landing-subtitle">Happy Birthday, Pottaa ❤️</p>
+    <button class="begin-btn" onclick="scrollToSection('s2')">Begin Our Journey</button>
+  </div>
+  <div class="scroll-hint">scroll ↓</div>
+</section>
+
+<!-- ===== SECTION 2: 1st Standard ===== -->
+<section id="s2" class="story-section">
+  <div class="petal" style="top:10%;left:5%;animation-delay:0s;transform:rotate(45deg)"></div>
+  <div class="petal" style="top:70%;right:8%;animation-delay:2s;transform:rotate(20deg)"></div>
+  <div class="story-inner fade-in">
+    <span class="chapter-label">Chapter One</span>
+    <span class="chapter-year">✦ 1st Standard ✦</span>
+   
+    <p class="story-text">We were just kids. Small shoes, big backpacks, and no idea what life had in store for us.</p>
+    <p class="story-text">First day of 1st standard. The classroom smelled like new notebooks and nervous excitement. I was sitting on the back bench, left side… finding my little corner in this big new world.</p>
+    <p class="story-text">And you were on the middle bench, right side. I don't know why I noticed you. Maybe it was the way you sat — calm, steady, like you already belonged there.</p>
+    <p class="story-text">Then the teacher asked you to watch who was making noise. A boy sneezed… and you turned and said his name. Just like that. No hesitation.</p>
+    <div class="emotional-quote">"I thought… <em>Who is he?</em><br>That tiny thought… was my first little crush on you."</div>
+    <div class="photo-slot">
+      <!-- Rename your 1st picture to img1.png and put it in this folder -->
+      <img src="img1.jpeg" alt="Childhood photo">
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 3: 2nd–5th ===== -->
+<section id="s3" class="story-section">
+  <div class="story-inner fade-in">
+    <span class="chapter-label">Chapter Two</span>
+    <span class="chapter-year">✦ 2nd – 5th Standard ✦</span>
+    <h2 class="chapter-title">Growing Feelings I Never Said Out Loud</h2>
+    <p class="story-text">Years passed. You became class leader — of course you did. Even then, you had that quiet authority, that way of making people listen without raising your voice.</p>
+    <p class="story-text">One day, you came to me. You asked me to secretly monitor the class while you stepped out. <em>Me.</em> Out of everyone. My heart jumped a little, though I'd never admit it.</p>
+    <p class="story-text">I did it happily. Not just because you asked… but because it meant you saw me. Even just for a second.</p>
+    <div class="emotional-quote">"There were moments our eyes met across the classroom.<br>I always looked away first.<br>But I was <em>always</em> watching you."</div>
+    <p class="story-text">5th standard came, and somehow, the universe decided we should sit together. Those paper games we played in the back of notebooks . I was terrible at hiding how happy I was.</p>
+    <p class="story-text">I didn't say a word about how I felt. But every single day, I chose to be near you, and that felt like enough.</p>
+    <div class="divider">✦ ❤️ ✦</div>
+  </div>
+</section>
+
+<!-- ===== SECTION 4: 6th Standard ===== -->
+<section id="s4" class="story-section">
+  <div class="story-inner fade-in">
+    <span class="chapter-label">Chapter Three</span>
+    <span class="chapter-year">✦ 6th Standard ✦</span>
+    <h2 class="chapter-title">The Year Everything Changed</h2>
+    <p class="story-text">Sixth standard. We sat together the whole year. An entire year of stolen glances, shared whispers, and stories I'd never told anyone else.</p>
+    <p class="story-text">You told me things about your life — the little things, the funny things, the real things. And I listened. Every single word. Because listening to you felt like reading a book I never wanted to end.</p>
+    <p class="story-text">I'd watch you from the school bus window. Sometimes you'd see me through the glass and wave — that little hand gesture, that quiet "hi." I'd smile and look away, pretending my heart wasn't racing.</p>
+    <div class="emotional-quote">"Annual day came.</em><br><br>That was the day… you finally noticed me."</div>
+    <div class="photo-slot">
+      <!-- Rename your 2nd picture to img2.png and put it in this folder -->
+      <img src="img2.jpeg" alt="School memory photo">
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 5: PROPOSAL ===== -->
+<section id="s5" class="story-section">
+  <div class="story-inner fade-in">
+    <span class="chapter-label">Chapter Four</span>
+    <span class="chapter-year">✦ The Day ✦</span>
+    <h2 class="chapter-title">You Chose Me Too</h2>
+    <p class="story-text">It started with your friend. He came to me and said — <em>"Someone loves you."</em></p>
+    <p class="story-text">My heart did something strange. I asked who. He smiled and walked away. And then… you came.</p>
+    <p class="story-text">You. Standing there. Looking at me the way I had looked at you for years. And you said it yourself — that it was you. That it had been you.</p>
+    <div class="emotional-quote">"I had already fallen for you, completely and quietly.<br>And that day… you chose me too."</div>
+    <p class="story-text">I said YES. ❤️</p>
+    <p class="story-text">It wasn't a grand moment. No fireworks, no movie music. Just you and me and the truest feeling I'd ever known. And somehow, that was more beautiful than anything I had imagined.</p>
+    <div class="divider">✦ 💕 ✦</div>
+  </div>
+</section>
+
+<!-- ===== SECTION 6: DISTANCE & DAIRY MILK ===== -->
+<section id="s6" class="story-section">
+  <div class="story-inner fade-in">
+    <span class="chapter-label">Chapter Five</span>
+    <span class="chapter-year">✦ 7th – 8th Standard ✦</span>
+    
+    <p class="story-text">I got upset. You had told others about us. About what we were. And something in me — silly, scared, stubborn me — couldn't handle that.</p>
+    <p class="story-text">I started ignoring you.I could see the hurt in your eyes, and still I looked away.</p>
+    <p class="story-text">I don't know why I did it. Maybe I was scared of people knowing how much I cared. Maybe I thought if I stepped back, it would hurt less. But it didn't. It hurt more.</p>
+    <div class="emotional-quote">"And then one day… you brought me a Dairy Milk.<br>Just that. A small chocolate. A quiet <em>'I still care.'</em><br><br>And I didn't take it.<br><br>I still regret that moment."</div>
+    <p class="story-text">I've thought about that chocolate more times than I can count. The way you held it out. The way I turned away. You didn't fight, didn't argue. You just quietly put it back and walked away.</p>
+    <p class="story-text"> Not the argument. Just that silent walk away.</p>
+    <div class="divider">✦ 💕 ✦</div>
+  </div>
+</section>
+
+<!-- ===== SECTION 7: SILENT LOVE ===== -->
+<section id="s7" class="story-section">
+  <div class="story-inner fade-in">
+    <span class="chapter-label">Chapter Six</span>
+    <span class="chapter-year">✦ 8th Standard ✦</span>
+    <h2 class="chapter-title">Words We Never Said</h2>
+    <p class="story-text">Different classes now. 8A and 8C — two rooms, two worlds, and yet somehow still the same orbit.</p>
+    <p class="story-text">I'd catch glimpses of you through classroom doors. The way you'd look up at exactly the right moment. Eyes that said everything the mouth wouldn't.</p>
+    <div class="emotional-quote">"We walked together on the road for the first time.<br>We didn't talk much.<br>But our eyes never stopped speaking."</div>
+    <p class="story-text">There was something sacred about that silence. Like we had our own language — made of glances and almost-smiles and the space between words.</p>
+    <p class="story-text">I loved you then. Quietly. Completely. And I think you knew.</p>
+  </div>
+</section>
+
+<!-- ===== SECTION 8: 9th–12th ===== -->
+<section id="s8" class="story-section">
+  <div class="story-inner fade-in">
+    <span class="chapter-label">Chapter Seven</span>
+    <span class="chapter-year">✦ 9th – 12th Standard ✦</span>
+    <h2 class="chapter-title">Different Schools, Same Heart</h2>
+    <p class="story-text">Life pulled us in different directions. Separate schools. Different routines. Days that passed without seeing your face.</p>
+    <p class="story-text">But at the end of 9th standard, we met. Just like that — an unexpected meeting that felt like breathing again after holding my breath for too long.</p>
+    <p class="story-text">And that bus journey together — the way time slowed down, the way everything outside the window blurred while you sat next to me.</p>
+    <div class="emotional-quote">"Then Corona came and the world went quiet.<br>But you and I kept talking.<br>Messages that became our lifeline."</div>
+    <p class="story-text">Tuition bus rides. Small shared moments carved out of ordinary days. Each one felt like a gift I hadn't expected.</p>
+    <p class="story-text">We were growing up. But some part of us — the part that started on a school bench — never changed.</p>
+ <div class="photo-slot">
+      <!-- Rename your 4th picture to img4.png and put it in this folder -->
+      <img src="img3.jpeg" alt="Bridge photo">
+    </div>
+</div>
+</section>
+
+<!-- ===== SECTION 9: LAST MEMORIES ===== -->
+<section id="s9" class="story-section">
+  <div class="story-inner fade-in">
+    <span class="chapter-label">Chapter Eight</span>
+    <span class="chapter-year">✦ Before Goodbye ✦</span>
+    <h2 class="chapter-title">The Bridge & Everything After</h2>
+    <p class="story-text">There was a wedding function — both of us there, somehow. The universe's doing, not ours.</p>
+    <p class="story-text">We walked to the bridge. Just us. The light was soft, the air was warm, and you had that look on your face — the one I'd been memorizing for years.</p>
+    <p class="story-text">We took photos there. Both of us laughing at something I can't even remember now. But I remember how alive I felt. How perfectly that moment fit.</p>
+    <div class="emotional-quote">"Before you left…<br>I gave you a kiss.<br><br>Not perfect. Not planned.<br>Just honest. Just full of love.<br>Just… <em>ours.</em>"</div>
+    <div class="photo-slot">
+      <!-- Rename your 4th picture to img4.png and put it in this folder -->
+      <img src="img4.jpeg" alt="Bridge photo">
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 10: GOODBYE ===== -->
+<section id="s10" class="story-section">
+  <div class="story-inner fade-in">
+    <span class="chapter-label">Chapter Nine</span>
+    <span class="chapter-year">✦ The Station ✦</span>
+    <h2 class="chapter-title">The Last Hug</h2>
+    <p class="story-text">The train station was loud. People everywhere — rushing, shouting, dragging luggage. And I stood there, trying very hard to hold myself together.</p>
+    
+    <p class="story-text">And then you hugged me.</p>
+    <div class="emotional-quote">"That hug.<br><br>I pressed my face into your shoulder and thought —<br><em>don't let go,don't let go.</em><br><br>I still feel it. Every quiet evening. I still feel it."</div>
+    <p class="story-text">i walked to the platform. I watched until I couldn't see you anymore. And then I stood there a little longer.</p>
+    <div class="divider">✦ 🚆 ✦</div>
+  </div>
+</section>
+
+<!-- ===== SECTION 11: LONG DISTANCE ===== -->
+<section id="s11" class="story-section">
+  <div class="story-inner fade-in">
+    <span class="chapter-label">Chapter Ten</span>
+    <span class="chapter-year">✦ Oceans Apart ✦</span>
+    <h2 class="chapter-title">No Matter the Distance</h2>
+    <p class="story-text">You went to Europe. I started engineering. We were now separated by thousands of miles, different time zones, different skies.</p>
+    <p class="story-text">But you call me while you drive. Your voice filling the space between us like it always has — warm, familiar, mine.</p>
+    <p class="story-text">I pick up every time. Even when I'm exhausted, even when I have deadlines, even at odd hours — because hearing your voice makes everything feel manageable again.</p>
+    <div class="emotional-quote">"You are in Europe.<br>I am here.<br>And yet —<br><br><em>No matter the distance…<br>You are still my home.</em>"</div>
+    <p class="story-text">Long distance is hard. The missing never quite goes away. But every call, every message, every small piece of you I get — I hold it like it's precious. Because it is.</p>
+    <div class="photo-slot">
+      <!-- Rename your 5th picture to img5.png and put it in this folder -->
+      <img src="img5.jpeg" alt="Distance photo">
+    </div>
+  </div>
+</section>
+
+<!-- ===== FINALE ===== -->
+<section id="finale" class="story-section" style="background: linear-gradient(135deg, #3D1A24, #5C2D3A, #3D1A24);min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;">
+  <div class="finale-content fade-in" style="position:relative;z-index:2;max-width:700px;">
+    <div class="finale-date" style="font-family:'Lato',sans-serif;font-size:0.85rem;letter-spacing:5px;color:rgba(255,200,180,0.7);margin-bottom:24px;text-transform:uppercase;">From the first bench • To forever</div>
+    <h2 style="font-family:'Dancing Script',cursive;font-size:clamp(2.5rem,6vw,5rem);color:#FFCBA4;margin-bottom:40px;line-height:1.2;">Happy Birthday,<br>Pottaaa ❤️</h2>
+    <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(1.1rem,2vw,1.4rem);line-height:2.1;color:rgba(255,220,200,0.9);margin-bottom:30px;">
+      From that first little crush …<br>
+      To every glance across classrooms…<br>
+      To  bus rides and silent smiles…<br>
+      To that hug at the station I never wanted to end…<br>
+      To calls across oceans while you drive…
+    </p>
+    <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(1.3rem,2.5vw,1.9rem);color:#F9C5D1;padding:30px;border:1px solid rgba(249,197,209,0.3);border-radius:10px;margin:30px 0;line-height:1.8;">
+      "I would choose you again.<br>In every life. Every time.<br>A thousand times over."
+    </div>
+    <div style="font-family:'Dancing Script',cursive;font-size:2rem;color:#FFCBA4;margin-top:30px;">Forever yours, with all my love 💕</div>
+  </div>
+  <!-- Animated hearts in bg -->
+  <div id="finale-hearts" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;"></div>
+</section>
+
+<!-- ===== FUTURE MESSAGE ===== -->
+<section id="future-section" style="background:linear-gradient(160deg,#FFF0F8,#FFF8F0);padding:100px 40px;">
+  <div style="max-width:700px;margin:0 auto;text-align:center;" class="fade-in">
+    <span style="font-family:'Dancing Script',cursive;font-size:1.1rem;color:#E8956D;letter-spacing:3px;">a letter to us</span>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3vw,2.8rem);color:#4A2C2A;margin:16px 0 30px;">Message for Future Us 🕊️</h2>
+    <p style="font-family:'Lato',sans-serif;font-weight:300;color:#7A4A4A;line-height:1.8;margin-bottom:10px;">Write something for the two of us to read someday — a wish, a promise, a memory, a dream.</p>
+    <textarea class="future-textarea" id="future-msg" placeholder="Dear future us… I hope we are still laughing together. I hope we have had a thousand more adventures. I hope you know how much I love you today, and how much more I will love you then…"></textarea>
+    <br>
+    <button class="future-btn" onclick="saveMessage()">💌 Save Our Message</button>
+    <div class="future-saved" id="future-confirm">✨ Saved with love, always ✨</div>
+  </div>
+</section>
+
+<script>
+// ===== MUSIC =====
+let musicPlaying = false;
+const audio = document.getElementById('bg-music');
+function toggleMusic() {
+  if (!musicPlaying) {
+    audio.play().catch(() => {});
+    musicPlaying = true;
+    document.getElementById('music-btn').textContent = '🎵 Music: ON';
+  } else {
+    audio.pause();
+    musicPlaying = false;
+    document.getElementById('music-btn').textContent = '🎵 Music: OFF';
+  }
+}
+
+// ===== SCROLL & FADE =====
+function scrollToSection(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+}
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Update timeline dot
+      const id = entry.target.closest('section')?.id;
+      if (id) {
+        document.querySelectorAll('.tl-dot').forEach(d => {
+          d.classList.toggle('active', d.dataset.target === id);
+        });
+      }
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ===== CLICK HEARTS =====
+const canvas = document.getElementById('hearts-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+const particles = [];
+const heartEmojis = ['❤️','💕','💗','💖','🌸','✨','💝'];
+
+document.addEventListener('click', (e) => {
+  for (let i = 0; i < 8; i++) {
+    particles.push({
+      x: e.clientX, y: e.clientY,
+      vx: (Math.random() - 0.5) * 4,
+      vy: -(Math.random() * 4 + 2),
+      life: 1,
+      decay: Math.random() * 0.02 + 0.015,
+      emoji: heartEmojis[Math.floor(Math.random() * heartEmojis.length)],
+      size: Math.random() * 16 + 14
+    });
+  }
+});
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.08;
+    p.life -= p.decay;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    ctx.globalAlpha = p.life;
+    ctx.font = `${p.size}px serif`;
+    ctx.fillText(p.emoji, p.x, p.y);
+  }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ===== FINALE FLOATING HEARTS =====
+function spawnFinaleHeart() {
+  const container = document.getElementById('finale-hearts');
+  if (!container) return;
+  const h = document.createElement('div');
+  const emojis = ['❤️','💕','💗','🌸','✨','💖'];
+  h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  h.style.cssText = `
+    position:absolute;
+    left:${Math.random()*100}%;
+    bottom:-40px;
+    font-size:${Math.random()*20+14}px;
+    opacity:${Math.random()*0.5+0.2};
+    animation: riseHeart ${Math.random()*6+6}s ease-in forwards;
+    pointer-events:none;
+  `;
+  container.appendChild(h);
+  setTimeout(() => h.remove(), 12000);
+}
+
+const style = document.createElement('style');
+style.textContent = `@keyframes riseHeart {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.4; }
+  100% { transform: translateY(-110vh) rotate(${Math.random()*60-30}deg); opacity: 0; }
+}`;
+document.head.appendChild(style);
+setInterval(spawnFinaleHeart, 600);
+
+// ===== PHOTO UPLOAD =====
+function triggerUpload(slot) {
+  slot.querySelector('input[type=file]').click();
+}
+function loadPhoto(input) {
+  const slot = input.closest('.photo-slot');
+  const img = slot.querySelector('img');
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    img.src = e.target.result;
+    img.style.display = 'block';
+    slot.querySelector('.photo-slot-icon').style.display = 'none';
+    slot.querySelector('.photo-slot-text').style.display = 'none';
+    slot.querySelector('.photo-slot-sub').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ===== FUTURE MESSAGE =====
+function saveMessage() {
+  const msg = document.getElementById('future-msg').value;
+  if (msg.trim()) {
+    localStorage.setItem('futureMessage', msg);
+    const confirm = document.getElementById('future-confirm');
+    confirm.style.display = 'block';
+    setTimeout(() => confirm.style.display = 'none', 3000);
+  }
+}
+
+// Load saved message
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('futureMessage');
+  if (saved) document.getElementById('future-msg').value = saved;
+});
+</script>
+</body>
+</html>
